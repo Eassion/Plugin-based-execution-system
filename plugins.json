@@ -1,0 +1,19 @@
+{
+  "plugins": [
+    {
+      "name": "uppercase",
+      "enabled": true,
+      "timeout_ms": 1000
+    },
+    {
+      "name": "wordcount",
+      "enabled": true,
+      "depends_on": ["uppercase"],
+      "timeout_ms": 1000
+    },
+    {
+      "name": "timestamp",
+      "enabled": false
+    }
+  ]
+}

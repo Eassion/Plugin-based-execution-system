@@ -113,36 +113,6 @@ _ = manager.Register(Example())
 - `internal/plugins/plugins.go`：示例插件集合
 - `cmd/app/main.go`：命令行入口
 
-## 面试讲解重点
-
-### 1. 插件依赖关系与执行顺序控制
-
-插件可以通过 `depends_on` 声明依赖关系。系统启动时会检查依赖插件是否存在、是否启用，并检测循环依赖。校验通过后，系统使用拓扑排序生成最终执行顺序。
-
-### 2. 插件运行状态管理与执行报告
-
-每个插件都会输出独立执行报告：
-
-```json
-{
-  "name": "uppercase",
-  "version": "1.0.0",
-  "enabled": true,
-  "status": "success",
-  "duration_ms": 1
-}
-```
-
-状态包括：
-
-- `success`：插件执行成功
-- `failed`：插件执行失败、超时或 panic
-- `skipped`：插件被禁用，未执行
-
-### 3. 插件失败隔离与超时控制
-
-系统会为每个插件创建带超时的 `context.Context`。插件返回错误、panic 或超过 `timeout_ms` 时，系统会记录失败原因，并继续执行后续插件。
-
 ## 测试
 
 ```bash

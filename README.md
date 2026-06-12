@@ -10,6 +10,7 @@
 - 支持插件执行超时控制，默认 30000ms，最大 60000ms
 - 单个插件失败、超时或 panic 不会导致主程序崩溃
 - 输出每个插件的启用状态、执行状态、耗时和错误信息
+- 支持 `plugins.json` 配置热加载，运行中可热启用或热卸载已注册插件
 - 提供 `uppercase`、`wordcount`、`timestamp` 三个示例插件
 
 ## 运行
@@ -29,6 +30,14 @@ go run ./cmd/app -input "hello plugin system"
 ```bash
 go run ./cmd/app -config plugins.json -input "hello plugin system"
 ```
+
+监听配置变化并热加载：
+
+```bash
+go run ./cmd/app -config plugins.json -input "hello plugin system" -watch
+```
+
+`-watch` 模式会持续监听 `plugins.json`。文件变化后，程序会重新读取配置、重建执行计划，并使用新的 pipeline 再执行一次。
 
 ## 插件接口
 
@@ -104,12 +113,16 @@ _ = manager.Register(Example())
 
 系统没有使用 Go 原生 `.so` 动态插件，原因是该机制在 Windows 环境下支持有限。当前实现使用“插件注册 + 配置驱动”的方式，保留插件化系统的核心能力，同时保证跨平台可运行。
 
+热加载机制只作用于配置层：新增插件代码后仍需要重新编译程序；运行中修改 `enabled`、`depends_on` 或 `timeout_ms` 会自动生效。热卸载就是把插件配置改为 `"enabled": false`。
+
 核心模块：
 
 - `internal/core/plugin.go`：插件接口和基础插件实现
 - `internal/core/manager.go`：插件注册、依赖校验、拓扑排序
 - `internal/core/pipeline.go`：插件流水线执行、超时控制、错误隔离
 - `internal/core/config.go`：插件配置读取
+- `internal/core/runtime.go`：可替换的运行时 pipeline
+- `internal/core/watcher.go`：配置文件监听和重载
 - `internal/plugins/plugins.go`：示例插件集合
 - `cmd/app/main.go`：命令行入口
 

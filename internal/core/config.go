@@ -1,6 +1,7 @@
 package core
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 )
@@ -21,6 +22,7 @@ func LoadConfig(path string) (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
+	content = bytes.TrimPrefix(content, []byte{0xEF, 0xBB, 0xBF})
 
 	var config Config
 	if err := json.Unmarshal(content, &config); err != nil {

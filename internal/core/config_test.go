@@ -30,3 +30,20 @@ func TestLoadConfigReadsPluginEntries(t *testing.T) {
 		t.Fatalf("unexpected second plugin: %#v", config.Plugins[1])
 	}
 }
+
+func TestLoadConfigAcceptsUTF8BOM(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "plugins.json")
+	content := append([]byte{0xEF, 0xBB, 0xBF}, []byte(`{"plugins":[{"name":"uppercase","enabled":true}]}`)...)
+	if err := os.WriteFile(path, content, 0644); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	config, err := core.LoadConfig(path)
+	if err != nil {
+		t.Fatalf("LoadConfig returned error: %v", err)
+	}
+
+	if len(config.Plugins) != 1 || config.Plugins[0].Name != "uppercase" || !config.Plugins[0].Enabled {
+		t.Fatalf("unexpected config: %#v", config)
+	}
+}

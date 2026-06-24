@@ -114,8 +114,15 @@ func (m *Manager) All() []PluginInfo {
 }
 
 type PluginInfo struct {
-	Name    string `json:"name"`
-	Version string `json:"version"`
+	Name        string   `json:"name"`
+	PluginID    string   `json:"plugin_id,omitempty"`
+	Version     string   `json:"version"`
+	DependsOn   []string `json:"depends_on,omitempty"`
+	UDSPath     string   `json:"uds_path,omitempty"`
+	Description string   `json:"description,omitempty"`
+	Enabled     bool     `json:"enabled,omitempty"`
+	Healthy     bool     `json:"healthy,omitempty"`
+	Draining    bool     `json:"draining,omitempty"`
 }
 
 type ConfiguredPlugin struct {
